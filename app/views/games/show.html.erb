@@ -1,0 +1,55 @@
+<h1>This is a Game show page</h1>
+
+<ul>
+  <% @game.rounds.each_with_index do |round,i| %>
+    <li>
+      round <%= i + 1 %>
+      <ul>
+        <% round.players.each do |player| %>
+          <li>
+            <div>
+              <div>
+                <%= player.username %>
+              </div>
+              <div>
+                score: <%= player_score(player,round) %>
+              </div>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </li>
+  <% end %>
+</ul>
+
+<% if @game.end %>
+  <h1> Final Scores </h1>
+<% else %>
+  <h1>Total Scores</h1>
+<% end %>
+
+<ul>
+  <% @game.rounds[0].players.each do |player| %>
+    <li>  
+      <%= player.username %> score: <%= total_points(@game,player) %>
+    </li>
+  <% end %>
+</ul>
+
+<% if !@game.end %>
+  <form action="<%= game_rounds_url(@game.id) %>" method="post">
+
+    <% @game.rounds[0].players.each_with_index do |player,i| %>
+      <ul> <%= player.username %> score
+        <input type="hidden" name="<%= "player#{i}" %>[id]" value="<%= player.id %>">
+        <div> Positve Cards
+          <input type="text" name="<%= "player#{i}" %>[pos_score]" value="">
+        </div>
+        <div> Negative Cards
+          <input type="text" name="<%= "player#{i}" %>[neg_score]" value="">
+        </div>
+      </ul>
+    <% end %>
+    <input type="submit" value="Submit">
+  </form>
+<% end  %>

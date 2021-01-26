@@ -1,0 +1,14 @@
+<h1>All Games</h1>
+
+<ul>
+  <% @games.each do |game| %>
+    <li>
+      <a href="<%= game_url(game.id) %>"><%= game.created_at %></a>
+      <% if game.end %>
+        <div> game is finished</div>
+      <% else %>
+        <div> game is ongoing</div>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
