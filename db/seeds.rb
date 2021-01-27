@@ -35,6 +35,13 @@ player_round6 = PlayerRound.create!(player_id: carlos.id, round_id: round3.id, s
 player_round7 = PlayerRound.create!(player_id: cassandra.id, round_id: round4.id, score: 100)
 player_round8 = PlayerRound.create!(player_id: carlos.id, round_id: round4.id, score: 20)
 
+game_player1 = GamePlayer.create(game_id: game1.id, player_id: cassandra.id)
+game_player2 = GamePlayer.create(game_id: game1.id, player_id: carlos.id)
+
+game_player3 = GamePlayer.create(game_id: game2.id, player_id: cassandra.id)
+game_player4 = GamePlayer.create(game_id: game2.id, player_id: carlos.id)
+
+
 
 
 

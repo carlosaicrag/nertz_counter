@@ -29,7 +29,7 @@
 <% end %>
 <% if @game.rounds[0] != nil %>
   <ul>
-    <% @game.rounds[0].players.each do |player| %>
+    <% @game.players.each do |player| %>
       <li>  
         <%= player.username %> score: <%= total_points(@game,player) %>
       </li>
@@ -40,7 +40,7 @@
 <% if !@game.end %>
   <form action="<%= game_rounds_url(@game.id) %>" method="post">
     
-    <% @game.rounds[0].players.each_with_index do |player,i| %>
+    <% @game.players.each_with_index do |player,i| %>
       <ul> <%= player.username %> score
         <input type="hidden" name="<%= "player#{i}" %>[id]" value="<%= player.id %>">
         <div> Positve Cards

@@ -4,8 +4,8 @@ class Player < ApplicationRecord
   class_name: :PlayerRound
 
   has_many :rounds,
-    through: :player_rounds,
-    source: :round 
+  through: :player_rounds,
+  source: :round 
 
   has_many :game_players,
   foreign_key: :player_id,

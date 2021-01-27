@@ -1,4 +1,6 @@
 class GamePlayer < ApplicationRecord
+  validates :player, :game_id, presence: true
+
   belongs_to :game,
     foreign_key: :game_id,
     class_name: :Game
