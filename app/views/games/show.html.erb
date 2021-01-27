@@ -27,18 +27,19 @@
 <% else %>
   <h1>Total Scores</h1>
 <% end %>
-
-<ul>
-  <% @game.rounds[0].players.each do |player| %>
-    <li>  
-      <%= player.username %> score: <%= total_points(@game,player) %>
-    </li>
-  <% end %>
-</ul>
+<% if @game.rounds[0] != nil %>
+  <ul>
+    <% @game.rounds[0].players.each do |player| %>
+      <li>  
+        <%= player.username %> score: <%= total_points(@game,player) %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
 
 <% if !@game.end %>
   <form action="<%= game_rounds_url(@game.id) %>" method="post">
-
+    
     <% @game.rounds[0].players.each_with_index do |player,i| %>
       <ul> <%= player.username %> score
         <input type="hidden" name="<%= "player#{i}" %>[id]" value="<%= player.id %>">

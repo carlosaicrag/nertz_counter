@@ -14720,3 +14720,906 @@ Processing by GamesController#index as HTML
 Completed 200 OK in 18ms (Views: 16.7ms | ActiveRecord: 0.6ms | Allocations: 5098)
 
 
+Started GET "/games/" for ::1 at 2021-01-26 14:48:59 -0800
+  [1m[35m (1.6ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by GamesController#index as HTML
+  Rendering games/index.html.erb within layouts/application
+  [1m[36mGame Load (0.7ms)[0m  [1m[34mSELECT "games".* FROM "games"[0m
+  ↳ app/views/games/index.html.erb:8
+  Rendered games/index.html.erb within layouts/application (Duration: 13.0ms | Allocations: 4542)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 55ms (Views: 39.2ms | ActiveRecord: 6.4ms | Allocations: 21131)
+
+
+Started POST "/games" for ::1 at 2021-01-26 14:49:04 -0800
+Processing by GamesController#create as HTML
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  ↳ app/controllers/games_controller.rb:9:in `create'
+  [1m[36mGame Create (1.0ms)[0m  [1m[32mINSERT INTO "games" ("created_at", "updated_at") VALUES ($1, $2) RETURNING "id"[0m  [["created_at", "2021-01-26 22:49:04.281294"], ["updated_at", "2021-01-26 22:49:04.281294"]]
+  ↳ app/controllers/games_controller.rb:9:in `create'
+  [1m[35m (1.2ms)[0m  [1m[35mCOMMIT[0m
+  ↳ app/controllers/games_controller.rb:9:in `create'
+Redirected to http://localhost:3000/games/17
+Completed 302 Found in 7ms (ActiveRecord: 2.4ms | Allocations: 3018)
+
+
+Started GET "/games/17" for ::1 at 2021-01-26 14:49:04 -0800
+Processing by GamesController#show as HTML
+  Parameters: {"id"=>"17"}
+  [1m[36mGame Load (0.3ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 17], ["LIMIT", 1]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  [1m[36mRound Load (0.6ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."game_id" = $1[0m  [["game_id", 17]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  Rendering games/show.html.erb within layouts/application
+  Rendered games/show.html.erb within layouts/application (Duration: 2.8ms | Allocations: 2391)
+Completed 500 Internal Server Error in 27ms (ActiveRecord: 2.6ms | Allocations: 16884)
+
+
+  
+ActionView::Template::Error (undefined method `players' for nil:NilClass):
+    29: <% end %>
+    30: 
+    31: <ul>
+    32:   <% @game.rounds[0].players.each do |player| %>
+    33:     <li>  
+    34:       <%= player.username %> score: <%= total_points(@game,player) %>
+    35:     </li>
+  
+app/views/games/show.html.erb:32
+app/controllers/games_controller.rb:20:in `show'
+Started GET "/games/17" for ::1 at 2021-01-26 14:51:09 -0800
+Processing by GamesController#show as HTML
+  Parameters: {"id"=>"17"}
+  [1m[36mGame Load (0.2ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 17], ["LIMIT", 1]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  [1m[36mRound Load (0.2ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."game_id" = $1[0m  [["game_id", 17]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  Rendering games/show.html.erb within layouts/application
+  Rendered games/show.html.erb within layouts/application (Duration: 0.7ms | Allocations: 1356)
+Completed 500 Internal Server Error in 23ms (ActiveRecord: 6.5ms | Allocations: 14542)
+
+
+  
+ActionView::SyntaxErrorInTemplate (Encountered a syntax error while rendering template: check <h1>This is a Game show page</h1>
+
+<ul>
+  <% @game.rounds.each_with_index do |round,i| %>
+    <li>
+      round <%= i + 1 %>
+      <ul>
+        <% round.players.each do |player| %>
+          <li>
+            <div>
+              <div>
+                <%= player.username %>
+              </div>
+              <div>
+                score: <%= player_score(player,round) %>
+              </div>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </li>
+  <% end %>
+</ul>
+
+<% if @game.end %>
+  <h1> Final Scores </h1>
+<% else %>
+  <h1>Total Scores</h1>
+<% end %>
+<% if @game.rounds[0] %>
+  <ul>
+    <% @game.rounds[0].players.each do |player| %>
+      <li>  
+        <%= player.username %> score: <%= total_points(@game,player) %>
+      </li>
+    <% end %>
+  </ul>
+<%  %>
+
+<% if !@game.end %>
+  <form action="<%= game_rounds_url(@game.id) %>" method="post">
+
+    <% @game.rounds[0].players.each_with_index do |player,i| %>
+      <ul> <%= player.username %> score
+        <input type="hidden" name="<%= "player#{i}" %>[id]" value="<%= player.id %>">
+        <div> Positve Cards
+          <input type="text" name="<%= "player#{i}" %>[pos_score]" value="">
+        </div>
+        <div> Negative Cards
+          <input type="text" name="<%= "player#{i}" %>[neg_score]" value="">
+        </div>
+      </ul>
+    <% end %>
+    <input type="submit" value="Submit">
+  </form>
+<% end  %>
+):
+1:    <h1>This is a Game show page</h1>
+2:    
+3:    <ul>
+4:      <% @game.rounds.each_with_index do |round,i| %>
+5:        <li>
+6:          round <%= i + 1 %>
+7:          <ul>
+8:            <% round.players.each do |player| %>
+9:              <li>
+10:                <div>
+11:                  <div>
+12:                    <%= player.username %>
+13:                  </div>
+14:                  <div>
+15:                    score: <%= player_score(player,round) %>
+16:                  </div>
+17:                </div>
+18:              </li>
+19:            <% end %>
+20:          </ul>
+21:        </li>
+22:      <% end %>
+23:    </ul>
+24:    
+25:    <% if @game.end %>
+26:      <h1> Final Scores </h1>
+27:    <% else %>
+28:      <h1>Total Scores</h1>
+29:    <% end %>
+30:    <% if @game.rounds[0] %>
+31:      <ul>
+32:        <% @game.rounds[0].players.each do |player| %>
+33:          <li>  
+34:            <%= player.username %> score: <%= total_points(@game,player) %>
+35:          </li>
+36:        <% end %>
+37:      </ul>
+38:    <%  %>
+39:    
+40:    <% if !@game.end %>
+41:      <form action="<%= game_rounds_url(@game.id) %>" method="post">
+42:    
+43:        <% @game.rounds[0].players.each_with_index do |player,i| %>
+44:          <ul> <%= player.username %> score
+45:            <input type="hidden" name="<%= "player#{i}" %>[id]" value="<%= player.id %>">
+46:            <div> Positve Cards
+47:              <input type="text" name="<%= "player#{i}" %>[pos_score]" value="">
+48:            </div>
+49:            <div> Negative Cards
+50:              <input type="text" name="<%= "player#{i}" %>[neg_score]" value="">
+51:            </div>
+52:          </ul>
+53:        <% end %>
+54:        <input type="submit" value="Submit">
+55:      </form>
+56:    <% end  %>
+  
+app/views/games/show.html.erb:58: syntax error, unexpected end-of-input, expecting keyword_end
+app/views/games/show.html.erb:58: syntax error, unexpected end-of-input, expecting keyword_end
+app/views/games/show.html.erb:58: syntax error, unexpected end-of-input, expecting keyword_end
+app/views/games/show.html.erb:58: syntax error, unexpected end-of-input, expecting keyword_end
+app/views/games/show.html.erb:58: syntax error, unexpected end-of-input, expecting keyword_end
+app/views/games/show.html.erb:58: syntax error, unexpected end-of-input, expecting keyword_end
+app/controllers/games_controller.rb:21:in `show'
+Started GET "/games/17" for ::1 at 2021-01-26 14:51:18 -0800
+Processing by GamesController#show as HTML
+  Parameters: {"id"=>"17"}
+  [1m[36mGame Load (0.4ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 17], ["LIMIT", 1]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  [1m[36mRound Load (0.3ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."game_id" = $1[0m  [["game_id", 17]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  Rendering games/show.html.erb within layouts/application
+  Rendered games/show.html.erb within layouts/application (Duration: 1.8ms | Allocations: 1818)
+Completed 500 Internal Server Error in 8ms (ActiveRecord: 0.7ms | Allocations: 5078)
+
+
+  
+ActionView::Template::Error (undefined method `players' for nil:NilClass):
+    40: <% if !@game.end %>
+    41:   <form action="<%= game_rounds_url(@game.id) %>" method="post">
+    42: 
+    43:     <% @game.rounds[0].players.each_with_index do |player,i| %>
+    44:       <ul> <%= player.username %> score
+    45:         <input type="hidden" name="<%= "player#{i}" %>[id]" value="<%= player.id %>">
+    46:         <div> Positve Cards
+  
+app/views/games/show.html.erb:43
+app/controllers/games_controller.rb:21:in `show'
+Started GET "/games/17" for ::1 at 2021-01-26 14:51:21 -0800
+Processing by GamesController#show as HTML
+  Parameters: {"id"=>"17"}
+  [1m[36mGame Load (0.3ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 17], ["LIMIT", 1]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  [1m[36mRound Load (0.2ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."game_id" = $1[0m  [["game_id", 17]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  Rendering games/show.html.erb within layouts/application
+  Rendered games/show.html.erb within layouts/application (Duration: 1.9ms | Allocations: 1814)
+Completed 500 Internal Server Error in 7ms (ActiveRecord: 0.5ms | Allocations: 5096)
+
+
+  
+ActionView::Template::Error (undefined method `players' for nil:NilClass):
+    40: <% if !@game.end %>
+    41:   <form action="<%= game_rounds_url(@game.id) %>" method="post">
+    42: 
+    43:     <% @game.rounds[0].players.each_with_index do |player,i| %>
+    44:       <ul> <%= player.username %> score
+    45:         <input type="hidden" name="<%= "player#{i}" %>[id]" value="<%= player.id %>">
+    46:         <div> Positve Cards
+  
+app/views/games/show.html.erb:43
+app/controllers/games_controller.rb:21:in `show'
+Started GET "/games/17" for ::1 at 2021-01-26 14:51:22 -0800
+Processing by GamesController#show as HTML
+  Parameters: {"id"=>"17"}
+  [1m[36mGame Load (0.3ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 17], ["LIMIT", 1]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  [1m[36mRound Load (0.3ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."game_id" = $1[0m  [["game_id", 17]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  Rendering games/show.html.erb within layouts/application
+  Rendered games/show.html.erb within layouts/application (Duration: 1.0ms | Allocations: 1242)
+Completed 500 Internal Server Error in 5ms (ActiveRecord: 0.6ms | Allocations: 3757)
+
+
+  
+ActionView::Template::Error (undefined method `players' for nil:NilClass):
+    40: <% if !@game.end %>
+    41:   <form action="<%= game_rounds_url(@game.id) %>" method="post">
+    42: 
+    43:     <% @game.rounds[0].players.each_with_index do |player,i| %>
+    44:       <ul> <%= player.username %> score
+    45:         <input type="hidden" name="<%= "player#{i}" %>[id]" value="<%= player.id %>">
+    46:         <div> Positve Cards
+  
+app/views/games/show.html.erb:43
+app/controllers/games_controller.rb:21:in `show'
+Started GET "/games/17" for ::1 at 2021-01-26 14:51:36 -0800
+Processing by GamesController#show as HTML
+  Parameters: {"id"=>"17"}
+  [1m[36mGame Load (0.4ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 17], ["LIMIT", 1]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  [1m[36mRound Load (0.3ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."game_id" = $1[0m  [["game_id", 17]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  Rendering games/show.html.erb within layouts/application
+  Rendered games/show.html.erb within layouts/application (Duration: 1.1ms | Allocations: 1244)
+Completed 500 Internal Server Error in 6ms (ActiveRecord: 0.7ms | Allocations: 3779)
+
+
+  
+ActionView::Template::Error (undefined method `players' for nil:NilClass):
+    40: <% if !@game.end %>
+    41:   <form action="<%= game_rounds_url(@game.id) %>" method="post">
+    42: 
+    43:     <% @game.rounds[0].players.each_with_index do |player,i| %>
+    44:       <ul> <%= player.username %> score
+    45:         <input type="hidden" name="<%= "player#{i}" %>[id]" value="<%= player.id %>">
+    46:         <div> Positve Cards
+  
+app/views/games/show.html.erb:43
+app/controllers/games_controller.rb:21:in `show'
+Started GET "/games/17" for ::1 at 2021-01-26 14:51:38 -0800
+Processing by GamesController#show as HTML
+  Parameters: {"id"=>"17"}
+  [1m[36mGame Load (0.3ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 17], ["LIMIT", 1]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  [1m[36mRound Load (0.3ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."game_id" = $1[0m  [["game_id", 17]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  Rendering games/show.html.erb within layouts/application
+  Rendered games/show.html.erb within layouts/application (Duration: 2.0ms | Allocations: 1766)
+Completed 500 Internal Server Error in 8ms (ActiveRecord: 0.5ms | Allocations: 5026)
+
+
+  
+ActionView::Template::Error (undefined method `length' for nil:NilClass):
+    27: <% else %>
+    28:   <h1>Total Scores</h1>
+    29: <% end %>
+    30: <% if @game.rounds[0].length > 0  %>
+    31:   <ul>
+    32:     <% @game.rounds[0].players.each do |player| %>
+    33:       <li>  
+  
+app/views/games/show.html.erb:30
+app/controllers/games_controller.rb:21:in `show'
+Started GET "/games/17" for ::1 at 2021-01-26 14:51:54 -0800
+Processing by GamesController#show as HTML
+  Parameters: {"id"=>"17"}
+  [1m[36mGame Load (0.4ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 17], ["LIMIT", 1]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  [1m[36mRound Load (0.1ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."game_id" = $1[0m  [["game_id", 17]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  Rendering games/show.html.erb within layouts/application
+  Rendered games/show.html.erb within layouts/application (Duration: 1.8ms | Allocations: 1811)
+Completed 500 Internal Server Error in 8ms (ActiveRecord: 0.5ms | Allocations: 5071)
+
+
+  
+ActionView::Template::Error (undefined method `players' for nil:NilClass):
+    40: <% if !@game.end %>
+    41:   <form action="<%= game_rounds_url(@game.id) %>" method="post">
+    42: 
+    43:     <% @game.rounds[0].players.each_with_index do |player,i| %>
+    44:       <ul> <%= player.username %> score
+    45:         <input type="hidden" name="<%= "player#{i}" %>[id]" value="<%= player.id %>">
+    46:         <div> Positve Cards
+  
+app/views/games/show.html.erb:43
+app/controllers/games_controller.rb:21:in `show'
+Started GET "/games/17" for ::1 at 2021-01-26 14:51:55 -0800
+Processing by GamesController#show as HTML
+  Parameters: {"id"=>"17"}
+  [1m[36mGame Load (0.3ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 17], ["LIMIT", 1]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  [1m[36mRound Load (0.2ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."game_id" = $1[0m  [["game_id", 17]]
+  ↳ app/controllers/games_controller.rb:18:in `show'
+  Rendering games/show.html.erb within layouts/application
+  Rendered games/show.html.erb within layouts/application (Duration: 1.7ms | Allocations: 1811)
+Completed 500 Internal Server Error in 7ms (ActiveRecord: 0.5ms | Allocations: 5071)
+
+
+  
+ActionView::Template::Error (undefined method `players' for nil:NilClass):
+    40: <% if !@game.end %>
+    41:   <form action="<%= game_rounds_url(@game.id) %>" method="post">
+    42: 
+    43:     <% @game.rounds[0].players.each_with_index do |player,i| %>
+    44:       <ul> <%= player.username %> score
+    45:         <input type="hidden" name="<%= "player#{i}" %>[id]" value="<%= player.id %>">
+    46:         <div> Positve Cards
+  
+app/views/games/show.html.erb:43
+app/controllers/games_controller.rb:21:in `show'
+  [1m[35m (0.8ms)[0m  [1m[34mSELECT pg_try_advisory_lock(7749438471370993215)[0m
+  [1m[35m (0.6ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to CreateGamePlayers (20210126231958)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (12.7ms)[0m  [1m[35mCREATE TABLE "game_players" ("id" bigserial primary key, "game_id" integer NOT NULL, "player_id" integer NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (1.9ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_game_players_on_game_id_and_player_id" ON "game_players"  ("game_id", "player_id")[0m
+  [1m[36mprimary::SchemaMigration Create (0.5ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20210126231958"]]
+  [1m[35m (0.4ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mActiveRecord::InternalMetadata Load (1.1ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT pg_advisory_unlock(7749438471370993215)[0m
+  [1m[35m (0.7ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started GET "/games/17" for ::1 at 2021-01-26 16:04:37 -0800
+  [1m[35m (0.8ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by GamesController#show as HTML
+  Parameters: {"id"=>"17"}
+  [1m[36mGame Load (0.6ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 17], ["LIMIT", 1]]
+  ↳ app/controllers/games_controller.rb:23:in `show'
+  [1m[36mRound Load (0.7ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."game_id" = $1[0m  [["game_id", 17]]
+  ↳ app/controllers/games_controller.rb:23:in `show'
+  Rendering games/show.html.erb within layouts/application
+  Rendered games/show.html.erb within layouts/application (Duration: 1.8ms | Allocations: 1779)
+Completed 500 Internal Server Error in 23ms (ActiveRecord: 1.4ms | Allocations: 14727)
+
+
+  
+ActionView::Template::Error (undefined method `players' for nil:NilClass):
+    40: <% if !@game.end %>
+    41:   <form action="<%= game_rounds_url(@game.id) %>" method="post">
+    42:     
+    43:     <% @game.rounds[0].players.each_with_index do |player,i| %>
+    44:       <ul> <%= player.username %> score
+    45:         <input type="hidden" name="<%= "player#{i}" %>[id]" value="<%= player.id %>">
+    46:         <div> Positve Cards
+  
+app/views/games/show.html.erb:43
+app/controllers/games_controller.rb:25:in `show'
+Started GET "/games/17" for ::1 at 2021-01-26 16:04:39 -0800
+Processing by GamesController#show as HTML
+  Parameters: {"id"=>"17"}
+  [1m[36mGame Load (0.3ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 17], ["LIMIT", 1]]
+  ↳ app/controllers/games_controller.rb:23:in `show'
+  [1m[36mRound Load (0.2ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."game_id" = $1[0m  [["game_id", 17]]
+  ↳ app/controllers/games_controller.rb:23:in `show'
+  Rendering games/show.html.erb within layouts/application
+  Rendered games/show.html.erb within layouts/application (Duration: 1.0ms | Allocations: 1266)
+Completed 500 Internal Server Error in 5ms (ActiveRecord: 0.5ms | Allocations: 3753)
+
+
+  
+ActionView::Template::Error (undefined method `players' for nil:NilClass):
+    40: <% if !@game.end %>
+    41:   <form action="<%= game_rounds_url(@game.id) %>" method="post">
+    42:     
+    43:     <% @game.rounds[0].players.each_with_index do |player,i| %>
+    44:       <ul> <%= player.username %> score
+    45:         <input type="hidden" name="<%= "player#{i}" %>[id]" value="<%= player.id %>">
+    46:         <div> Positve Cards
+  
+app/views/games/show.html.erb:43
+app/controllers/games_controller.rb:25:in `show'
+Started GET "/games/1" for ::1 at 2021-01-26 16:04:44 -0800
+Processing by GamesController#show as HTML
+  Parameters: {"id"=>"1"}
+  [1m[36mGame Load (0.4ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/games_controller.rb:23:in `show'
+  Rendering games/show.html.erb within layouts/application
+  Rendered games/show.html.erb within layouts/application (Duration: 1.6ms | Allocations: 1197)
+Completed 500 Internal Server Error in 5ms (ActiveRecord: 0.4ms | Allocations: 2423)
+
+
+  
+ActionView::Template::Error (undefined method `rounds' for nil:NilClass):
+    1: <h1>This is a Game show page</h1>
+    2: 
+    3: <ul>
+    4:   <% @game.rounds.each_with_index do |round,i| %>
+    5:     <li>
+    6:       round <%= i + 1 %>
+    7:       <ul>
+  
+app/views/games/show.html.erb:4
+app/controllers/games_controller.rb:25:in `show'
+Started GET "/games/" for ::1 at 2021-01-26 16:04:45 -0800
+Processing by GamesController#index as HTML
+  Rendering games/index.html.erb within layouts/application
+  [1m[36mGame Load (0.2ms)[0m  [1m[34mSELECT "games".* FROM "games"[0m
+  ↳ app/views/games/index.html.erb:6
+  Rendered games/index.html.erb within layouts/application (Duration: 2.0ms | Allocations: 1026)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 12ms (Views: 11.3ms | ActiveRecord: 0.2ms | Allocations: 5725)
+
+
+Started GET "/games/new" for ::1 at 2021-01-26 16:04:47 -0800
+Processing by GamesController#new as HTML
+  Rendering games/new.html.erb within layouts/application
+  Rendered games/new.html.erb within layouts/application (Duration: 3.1ms | Allocations: 1048)
+Completed 500 Internal Server Error in 5ms (ActiveRecord: 0.0ms | Allocations: 1659)
+
+
+  
+ActionView::SyntaxErrorInTemplate (Encountered a syntax error while rendering template: check <h1> Creating a new Game page</h1>
+
+<form action="/games" method="post">
+  <input type="submit" value="create a new Game">
+  <% @players.each do |player| %>
+    <label> <%= player.username %>
+        <input type="checkbox" name="player[player_ids][]" id="" value="<% player.id %>"> 
+    </label>
+  <%  %>
+</form>
+):
+1:    <h1> Creating a new Game page</h1>
+2:    
+3:    <form action="/games" method="post">
+4:      <input type="submit" value="create a new Game">
+5:      <% @players.each do |player| %>
+6:        <label> <%= player.username %>
+7:            <input type="checkbox" name="player[player_ids][]" id="" value="<% player.id %>"> 
+8:        </label>
+9:      <%  %>
+10:    </form>
+  
+app/views/games/new.html.erb:12: syntax error, unexpected end-of-input, expecting keyword_end
+app/views/games/new.html.erb:12: syntax error, unexpected end-of-input, expecting keyword_end
+app/views/games/new.html.erb:12: syntax error, unexpected end-of-input, expecting keyword_end
+app/views/games/new.html.erb:12: syntax error, unexpected end-of-input, expecting keyword_end
+app/views/games/new.html.erb:12: syntax error, unexpected end-of-input, expecting keyword_end
+app/views/games/new.html.erb:12: syntax error, unexpected end-of-input, expecting keyword_end
+app/controllers/games_controller.rb:8:in `new'
+Started GET "/games/new" for ::1 at 2021-01-26 16:05:07 -0800
+Processing by GamesController#new as HTML
+  Rendering games/new.html.erb within layouts/application
+  [1m[36mPlayer Load (0.6ms)[0m  [1m[34mSELECT "players".* FROM "players"[0m
+  ↳ app/views/games/new.html.erb:5
+  Rendered games/new.html.erb within layouts/application (Duration: 11.2ms | Allocations: 4016)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 19ms (Views: 13.5ms | ActiveRecord: 5.4ms | Allocations: 9290)
+
+
+Started GET "/games/new" for ::1 at 2021-01-26 16:05:20 -0800
+Processing by GamesController#new as HTML
+  Rendering games/new.html.erb within layouts/application
+  [1m[36mPlayer Load (0.4ms)[0m  [1m[34mSELECT "players".* FROM "players"[0m
+  ↳ app/views/games/new.html.erb:5
+  Rendered games/new.html.erb within layouts/application (Duration: 1.6ms | Allocations: 935)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 8ms (Views: 7.6ms | ActiveRecord: 0.4ms | Allocations: 5253)
+
+
+Started GET "/games/new" for ::1 at 2021-01-26 16:05:21 -0800
+Processing by GamesController#new as HTML
+  Rendering games/new.html.erb within layouts/application
+  [1m[36mPlayer Load (0.3ms)[0m  [1m[34mSELECT "players".* FROM "players"[0m
+  ↳ app/views/games/new.html.erb:5
+  Rendered games/new.html.erb within layouts/application (Duration: 1.6ms | Allocations: 935)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 8ms (Views: 6.9ms | ActiveRecord: 0.3ms | Allocations: 5250)
+
+
+Started GET "/games/new" for ::1 at 2021-01-26 16:05:33 -0800
+Processing by GamesController#new as HTML
+  Rendering games/new.html.erb within layouts/application
+  [1m[36mPlayer Load (0.5ms)[0m  [1m[34mSELECT "players".* FROM "players"[0m
+  ↳ app/views/games/new.html.erb:4
+  Rendered games/new.html.erb within layouts/application (Duration: 2.1ms | Allocations: 1104)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 11ms (Views: 10.5ms | ActiveRecord: 0.5ms | Allocations: 6372)
+
+
+Started GET "/games/new" for ::1 at 2021-01-26 16:05:34 -0800
+Processing by GamesController#new as HTML
+  Rendering games/new.html.erb within layouts/application
+  [1m[36mPlayer Load (0.2ms)[0m  [1m[34mSELECT "players".* FROM "players"[0m
+  ↳ app/views/games/new.html.erb:4
+  Rendered games/new.html.erb within layouts/application (Duration: 1.8ms | Allocations: 935)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 9ms (Views: 8.0ms | ActiveRecord: 0.2ms | Allocations: 5253)
+
+
+Started GET "/games/new" for ::1 at 2021-01-26 16:06:16 -0800
+Processing by GamesController#new as HTML
+  Rendering games/new.html.erb within layouts/application
+  [1m[36mPlayer Load (0.2ms)[0m  [1m[34mSELECT "players".* FROM "players" LIMIT $1[0m  [["LIMIT", 11]]
+  ↳ app/views/games/new.html.erb:5
+  [1m[36mPlayer Load (0.5ms)[0m  [1m[34mSELECT "players".* FROM "players"[0m
+  ↳ app/views/games/new.html.erb:5
+  Rendered games/new.html.erb within layouts/application (Duration: 17111.8ms | Allocations: 71084)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 17120ms (Views: 17118.9ms | ActiveRecord: 0.7ms | Allocations: 76264)
+
+
+  [1m[35m (0.8ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mGame Load (0.6ms)[0m  [1m[34mSELECT "games".* FROM "games"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mGame Destroy (0.6ms)[0m  [1m[31mDELETE FROM "games" WHERE "games"."id" = $1[0m  [["id", 15]]
+  [1m[35m (0.7ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mGame Destroy (0.4ms)[0m  [1m[31mDELETE FROM "games" WHERE "games"."id" = $1[0m  [["id", 16]]
+  [1m[35m (0.4ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mGame Destroy (0.4ms)[0m  [1m[31mDELETE FROM "games" WHERE "games"."id" = $1[0m  [["id", 17]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mRound Load (0.6ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mRound Destroy (0.3ms)[0m  [1m[31mDELETE FROM "rounds" WHERE "rounds"."id" = $1[0m  [["id", 67]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mRound Destroy (0.3ms)[0m  [1m[31mDELETE FROM "rounds" WHERE "rounds"."id" = $1[0m  [["id", 68]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mRound Destroy (0.3ms)[0m  [1m[31mDELETE FROM "rounds" WHERE "rounds"."id" = $1[0m  [["id", 69]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mRound Destroy (0.7ms)[0m  [1m[31mDELETE FROM "rounds" WHERE "rounds"."id" = $1[0m  [["id", 70]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mGame Create (0.4ms)[0m  [1m[32mINSERT INTO "games" ("created_at", "updated_at") VALUES ($1, $2) RETURNING "id"[0m  [["created_at", "2021-01-27 00:06:42.315494"], ["updated_at", "2021-01-27 00:06:42.315494"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mGame Create (0.2ms)[0m  [1m[32mINSERT INTO "games" ("end", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["end", true], ["created_at", "2021-01-27 00:06:42.319154"], ["updated_at", "2021-01-27 00:06:42.319154"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Create (0.5ms)[0m  [1m[32mINSERT INTO "players" ("username", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["username", "Cassandra"], ["created_at", "2021-01-27 00:06:42.332642"], ["updated_at", "2021-01-27 00:06:42.332642"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Create (0.2ms)[0m  [1m[32mINSERT INTO "players" ("username", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["username", "Carlos"], ["created_at", "2021-01-27 00:06:42.336466"], ["updated_at", "2021-01-27 00:06:42.336466"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Create (0.2ms)[0m  [1m[32mINSERT INTO "players" ("username", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["username", "Joanne"], ["created_at", "2021-01-27 00:06:42.339438"], ["updated_at", "2021-01-27 00:06:42.339438"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mGame Load (0.2ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 18], ["LIMIT", 1]]
+  [1m[36mRound Create (0.7ms)[0m  [1m[32mINSERT INTO "rounds" ("game_id", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["game_id", 18], ["created_at", "2021-01-27 00:06:42.350654"], ["updated_at", "2021-01-27 00:06:42.350654"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mGame Load (0.2ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 18], ["LIMIT", 1]]
+  [1m[36mRound Create (0.3ms)[0m  [1m[32mINSERT INTO "rounds" ("game_id", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["game_id", 18], ["created_at", "2021-01-27 00:06:42.355565"], ["updated_at", "2021-01-27 00:06:42.355565"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mGame Load (0.2ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 18], ["LIMIT", 1]]
+  [1m[36mRound Create (0.3ms)[0m  [1m[32mINSERT INTO "rounds" ("game_id", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["game_id", 18], ["created_at", "2021-01-27 00:06:42.360782"], ["updated_at", "2021-01-27 00:06:42.360782"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mGame Load (0.2ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 19], ["LIMIT", 1]]
+  [1m[36mRound Create (0.2ms)[0m  [1m[32mINSERT INTO "rounds" ("game_id", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["game_id", 19], ["created_at", "2021-01-27 00:06:42.365261"], ["updated_at", "2021-01-27 00:06:42.365261"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.3ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 22], ["LIMIT", 1]]
+  [1m[36mRound Load (0.2ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 71], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (0.5ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 71], ["player_id", 22], ["score", 20], ["created_at", "2021-01-27 00:06:42.383960"], ["updated_at", "2021-01-27 00:06:42.383960"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.2ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 23], ["LIMIT", 1]]
+  [1m[36mRound Load (0.2ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 71], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (0.3ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 71], ["player_id", 23], ["score", 20], ["created_at", "2021-01-27 00:06:42.390304"], ["updated_at", "2021-01-27 00:06:42.390304"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.2ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 22], ["LIMIT", 1]]
+  [1m[36mRound Load (0.2ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 72], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (0.3ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 72], ["player_id", 22], ["score", 20], ["created_at", "2021-01-27 00:06:42.397616"], ["updated_at", "2021-01-27 00:06:42.397616"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.2ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 23], ["LIMIT", 1]]
+  [1m[36mRound Load (0.5ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 72], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (0.3ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 72], ["player_id", 23], ["score", 20], ["created_at", "2021-01-27 00:06:42.403873"], ["updated_at", "2021-01-27 00:06:42.403873"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.2ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 22], ["LIMIT", 1]]
+  [1m[36mRound Load (0.2ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 73], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (0.3ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 73], ["player_id", 22], ["score", 20], ["created_at", "2021-01-27 00:06:42.409845"], ["updated_at", "2021-01-27 00:06:42.409845"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.3ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 23], ["LIMIT", 1]]
+  [1m[36mRound Load (0.2ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 73], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (0.3ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 73], ["player_id", 23], ["score", 20], ["created_at", "2021-01-27 00:06:42.416515"], ["updated_at", "2021-01-27 00:06:42.416515"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.1ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 22], ["LIMIT", 1]]
+  [1m[36mRound Load (0.1ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 74], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (0.2ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 74], ["player_id", 22], ["score", 100], ["created_at", "2021-01-27 00:06:42.421624"], ["updated_at", "2021-01-27 00:06:42.421624"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.2ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 23], ["LIMIT", 1]]
+  [1m[36mRound Load (0.2ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 74], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (0.3ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 74], ["player_id", 23], ["score", 20], ["created_at", "2021-01-27 00:06:42.427814"], ["updated_at", "2021-01-27 00:06:42.427814"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_try_advisory_lock(7749438471370993215)[0m
+  [1m[35m (0.7ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to UpdatePlayersTable (20210127000731)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (3.3ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_players_on_username" ON "players"  ("username")[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT pg_advisory_unlock(7749438471370993215)[0m
+  [1m[35m (0.9ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_try_advisory_lock(7749438471370993215)[0m
+  [1m[35m (0.8ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to UpdatePlayersTable (20210127000731)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (2.6ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_players_on_username" ON "players"  ("username")[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_advisory_unlock(7749438471370993215)[0m
+  [1m[35m (0.8ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.4ms)[0m  [1m[34mSELECT "ar_internal_metadata"."value" FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1[0m  [["key", "environment"]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "ar_internal_metadata"."value" FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1[0m  [["key", "environment"]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "ar_internal_metadata"."value" FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1[0m  [["key", "environment"]]
+  [1m[35m (203.2ms)[0m  [1m[35mDROP DATABASE IF EXISTS "nertz_score_counter_development"[0m
+  [1m[35m (200.4ms)[0m  [1m[35mDROP DATABASE IF EXISTS "nertz_score_counter_test"[0m
+  [1m[35m (496.8ms)[0m  [1m[35mCREATE DATABASE "nertz_score_counter_development" ENCODING = 'unicode'[0m
+  [1m[35m (404.3ms)[0m  [1m[35mCREATE DATABASE "nertz_score_counter_test" ENCODING = 'unicode'[0m
+  [1m[35mSQL (0.5ms)[0m  [1m[35mCREATE EXTENSION IF NOT EXISTS "plpgsql"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mDROP TABLE IF EXISTS "game_players" CASCADE[0m
+  [1m[35m (6.1ms)[0m  [1m[35mCREATE TABLE "game_players" ("id" bigserial primary key, "game_id" integer NOT NULL, "player_id" integer NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (1.4ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_game_players_on_game_id_and_player_id" ON "game_players"  ("game_id", "player_id")[0m
+  [1m[35m (0.3ms)[0m  [1m[35mDROP TABLE IF EXISTS "games" CASCADE[0m
+  [1m[35m (2.8ms)[0m  [1m[35mCREATE TABLE "games" ("id" bigserial primary key, "end" boolean DEFAULT FALSE NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (1.3ms)[0m  [1m[35mCREATE  INDEX  "index_games_on_end" ON "games"  ("end")[0m
+  [1m[35m (0.2ms)[0m  [1m[35mDROP TABLE IF EXISTS "player_rounds" CASCADE[0m
+  [1m[35m (3.8ms)[0m  [1m[35mCREATE TABLE "player_rounds" ("id" bigserial primary key, "round_id" integer NOT NULL, "player_id" integer NOT NULL, "score" integer NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (1.6ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_player_rounds_on_round_id_and_player_id" ON "player_rounds"  ("round_id", "player_id")[0m
+  [1m[35m (0.3ms)[0m  [1m[35mDROP TABLE IF EXISTS "players" CASCADE[0m
+  [1m[35m (3.4ms)[0m  [1m[35mCREATE TABLE "players" ("id" bigserial primary key, "username" character varying NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (0.4ms)[0m  [1m[35mDROP TABLE IF EXISTS "rounds" CASCADE[0m
+  [1m[35m (2.2ms)[0m  [1m[35mCREATE TABLE "rounds" ("id" bigserial primary key, "game_id" integer NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (0.9ms)[0m  [1m[35mCREATE  INDEX  "index_rounds_on_game_id" ON "rounds"  ("game_id")[0m
+  [1m[35m (2.3ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" character varying NOT NULL PRIMARY KEY)[0m
+  [1m[35m (1.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.9ms)[0m  [1m[32mINSERT INTO "schema_migrations" (version) VALUES (20210126231958)[0m
+  [1m[35m (0.9ms)[0m  [1m[32mINSERT INTO "schema_migrations" (version) VALUES
+(20210122034707),
+(20210122034914),
+(20210122035338),
+(20210125023504),
+(20210125025221);
+
+[0m
+  [1m[35m (2.9ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" character varying NOT NULL PRIMARY KEY, "value" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.3ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mActiveRecord::InternalMetadata Create (0.5ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "key"[0m  [["key", "environment"], ["value", "development"], ["created_at", "2021-01-27 00:08:45.780732"], ["updated_at", "2021-01-27 00:08:45.780732"]]
+  [1m[35m (0.4ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "schema_sha1"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mActiveRecord::InternalMetadata Create (0.2ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "key"[0m  [["key", "schema_sha1"], ["value", "3d29225f37950bb036fd5aa24e7b4869d2961a64"], ["created_at", "2021-01-27 00:08:45.787641"], ["updated_at", "2021-01-27 00:08:45.787641"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[35mCREATE EXTENSION IF NOT EXISTS "plpgsql"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE IF EXISTS "game_players" CASCADE[0m
+  [1m[35m (6.2ms)[0m  [1m[35mCREATE TABLE "game_players" ("id" bigserial primary key, "game_id" integer NOT NULL, "player_id" integer NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (1.4ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_game_players_on_game_id_and_player_id" ON "game_players"  ("game_id", "player_id")[0m
+  [1m[35m (0.2ms)[0m  [1m[35mDROP TABLE IF EXISTS "games" CASCADE[0m
+  [1m[35m (2.2ms)[0m  [1m[35mCREATE TABLE "games" ("id" bigserial primary key, "end" boolean DEFAULT FALSE NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (0.9ms)[0m  [1m[35mCREATE  INDEX  "index_games_on_end" ON "games"  ("end")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE IF EXISTS "player_rounds" CASCADE[0m
+  [1m[35m (3.4ms)[0m  [1m[35mCREATE TABLE "player_rounds" ("id" bigserial primary key, "round_id" integer NOT NULL, "player_id" integer NOT NULL, "score" integer NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (1.5ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_player_rounds_on_round_id_and_player_id" ON "player_rounds"  ("round_id", "player_id")[0m
+  [1m[35m (0.2ms)[0m  [1m[35mDROP TABLE IF EXISTS "players" CASCADE[0m
+  [1m[35m (5.0ms)[0m  [1m[35mCREATE TABLE "players" ("id" bigserial primary key, "username" character varying NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (0.3ms)[0m  [1m[35mDROP TABLE IF EXISTS "rounds" CASCADE[0m
+  [1m[35m (3.8ms)[0m  [1m[35mCREATE TABLE "rounds" ("id" bigserial primary key, "game_id" integer NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (1.1ms)[0m  [1m[35mCREATE  INDEX  "index_rounds_on_game_id" ON "rounds"  ("game_id")[0m
+  [1m[35m (2.6ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" character varying NOT NULL PRIMARY KEY)[0m
+  [1m[35m (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.9ms)[0m  [1m[32mINSERT INTO "schema_migrations" (version) VALUES (20210126231958)[0m
+  [1m[35m (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" (version) VALUES
+(20210122034707),
+(20210122034914),
+(20210122035338),
+(20210125023504),
+(20210125025221);
+
+[0m
+  [1m[35m (2.9ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" character varying NOT NULL PRIMARY KEY, "value" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.3ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mActiveRecord::InternalMetadata Create (0.4ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "key"[0m  [["key", "environment"], ["value", "development"], ["created_at", "2021-01-27 00:08:45.884261"], ["updated_at", "2021-01-27 00:08:45.884261"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.3ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mActiveRecord::InternalMetadata Update (0.4ms)[0m  [1m[33mUPDATE "ar_internal_metadata" SET "value" = $1, "updated_at" = $2 WHERE "ar_internal_metadata"."key" = $3[0m  [["value", "test"], ["updated_at", "2021-01-27 00:08:45.889427"], ["key", "environment"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.4ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "schema_sha1"], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mActiveRecord::InternalMetadata Create (0.3ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "key"[0m  [["key", "schema_sha1"], ["value", "3d29225f37950bb036fd5aa24e7b4869d2961a64"], ["created_at", "2021-01-27 00:08:45.896479"], ["updated_at", "2021-01-27 00:08:45.896479"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.7ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.7ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT pg_try_advisory_lock(7749438471370993215)[0m
+  [1m[35m (0.8ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to UpdatePlayersTable (20210127000731)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (1.7ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_players_on_username" ON "players"  ("username")[0m
+  [1m[36mprimary::SchemaMigration Create (0.5ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20210127000731"]]
+  [1m[35m (0.5ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.6ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT pg_advisory_unlock(7749438471370993215)[0m
+  [1m[35m (0.6ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.6ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mGame Load (0.8ms)[0m  [1m[34mSELECT "games".* FROM "games"[0m
+  [1m[36mRound Load (0.6ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds"[0m
+  [1m[36mPlayer Load (0.8ms)[0m  [1m[34mSELECT "players".* FROM "players"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mGame Create (0.9ms)[0m  [1m[32mINSERT INTO "games" ("created_at", "updated_at") VALUES ($1, $2) RETURNING "id"[0m  [["created_at", "2021-01-27 00:09:08.200923"], ["updated_at", "2021-01-27 00:09:08.200923"]]
+  [1m[35m (0.6ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mGame Create (0.3ms)[0m  [1m[32mINSERT INTO "games" ("end", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["end", true], ["created_at", "2021-01-27 00:09:08.208095"], ["updated_at", "2021-01-27 00:09:08.208095"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Create (0.9ms)[0m  [1m[32mINSERT INTO "players" ("username", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["username", "Cassandra"], ["created_at", "2021-01-27 00:09:08.222931"], ["updated_at", "2021-01-27 00:09:08.222931"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Create (0.3ms)[0m  [1m[32mINSERT INTO "players" ("username", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["username", "Carlos"], ["created_at", "2021-01-27 00:09:08.229083"], ["updated_at", "2021-01-27 00:09:08.229083"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Create (0.2ms)[0m  [1m[32mINSERT INTO "players" ("username", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["username", "Joanne"], ["created_at", "2021-01-27 00:09:08.234414"], ["updated_at", "2021-01-27 00:09:08.234414"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mGame Load (0.2ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  [1m[36mRound Create (0.4ms)[0m  [1m[32mINSERT INTO "rounds" ("game_id", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["game_id", 1], ["created_at", "2021-01-27 00:09:08.257135"], ["updated_at", "2021-01-27 00:09:08.257135"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mGame Load (0.3ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  [1m[36mRound Create (0.2ms)[0m  [1m[32mINSERT INTO "rounds" ("game_id", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["game_id", 1], ["created_at", "2021-01-27 00:09:08.261790"], ["updated_at", "2021-01-27 00:09:08.261790"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mGame Load (0.2ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  [1m[36mRound Create (0.2ms)[0m  [1m[32mINSERT INTO "rounds" ("game_id", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["game_id", 1], ["created_at", "2021-01-27 00:09:08.266352"], ["updated_at", "2021-01-27 00:09:08.266352"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mGame Load (0.2ms)[0m  [1m[34mSELECT "games".* FROM "games" WHERE "games"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  [1m[36mRound Create (0.3ms)[0m  [1m[32mINSERT INTO "rounds" ("game_id", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["game_id", 2], ["created_at", "2021-01-27 00:09:08.270763"], ["updated_at", "2021-01-27 00:09:08.270763"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.2ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  [1m[36mRound Load (0.2ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (1.2ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 1], ["player_id", 1], ["score", 20], ["created_at", "2021-01-27 00:09:08.287357"], ["updated_at", "2021-01-27 00:09:08.287357"]]
+  [1m[35m (0.4ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.2ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  [1m[36mRound Load (0.3ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (0.3ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 1], ["player_id", 2], ["score", 20], ["created_at", "2021-01-27 00:09:08.294671"], ["updated_at", "2021-01-27 00:09:08.294671"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.1ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  [1m[36mRound Load (0.2ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (0.2ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 2], ["player_id", 1], ["score", 20], ["created_at", "2021-01-27 00:09:08.300105"], ["updated_at", "2021-01-27 00:09:08.300105"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.2ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  [1m[36mRound Load (0.1ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (0.3ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 2], ["player_id", 2], ["score", 20], ["created_at", "2021-01-27 00:09:08.305227"], ["updated_at", "2021-01-27 00:09:08.305227"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.1ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  [1m[36mRound Load (0.2ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 3], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (0.5ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 3], ["player_id", 1], ["score", 20], ["created_at", "2021-01-27 00:09:08.310343"], ["updated_at", "2021-01-27 00:09:08.310343"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.2ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  [1m[36mRound Load (0.1ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 3], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (0.4ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 3], ["player_id", 2], ["score", 20], ["created_at", "2021-01-27 00:09:08.315789"], ["updated_at", "2021-01-27 00:09:08.315789"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.1ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  [1m[36mRound Load (0.1ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 4], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (0.4ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 4], ["player_id", 1], ["score", 100], ["created_at", "2021-01-27 00:09:08.320663"], ["updated_at", "2021-01-27 00:09:08.320663"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPlayer Load (0.1ms)[0m  [1m[34mSELECT "players".* FROM "players" WHERE "players"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  [1m[36mRound Load (0.2ms)[0m  [1m[34mSELECT "rounds".* FROM "rounds" WHERE "rounds"."id" = $1 LIMIT $2[0m  [["id", 4], ["LIMIT", 1]]
+  [1m[36mPlayerRound Create (0.2ms)[0m  [1m[32mINSERT INTO "player_rounds" ("round_id", "player_id", "score", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["round_id", 4], ["player_id", 2], ["score", 20], ["created_at", "2021-01-27 00:09:08.326351"], ["updated_at", "2021-01-27 00:09:08.326351"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+Started GET "/games/new" for ::1 at 2021-01-26 16:09:21 -0800
+  [1m[35m (0.8ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by GamesController#new as HTML
+  Rendering games/new.html.erb within layouts/application
+  [1m[36mPlayer Load (0.7ms)[0m  [1m[34mSELECT "players".* FROM "players"[0m
+  ↳ app/views/games/new.html.erb:5
+  Rendered games/new.html.erb within layouts/application (Duration: 15611.1ms | Allocations: 68931)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 15638ms (Views: 15626.0ms | ActiveRecord: 5.8ms | Allocations: 80673)
+
+
+Started GET "/games/new" for ::1 at 2021-01-26 16:20:25 -0800
+Processing by GamesController#new as HTML
+  Rendering games/new.html.erb within layouts/application
+  [1m[36mPlayer Load (1.0ms)[0m  [1m[34mSELECT "players".* FROM "players"[0m
+  ↳ app/views/games/new.html.erb:4
+  Rendered games/new.html.erb within layouts/application (Duration: 5.9ms | Allocations: 3628)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 23ms (Views: 18.5ms | ActiveRecord: 1.0ms | Allocations: 10380)
+
+
+Started GET "/games/new" for ::1 at 2021-01-26 16:20:35 -0800
+Processing by GamesController#new as HTML
+  Rendering games/new.html.erb within layouts/application
+  [1m[36mPlayer Load (0.3ms)[0m  [1m[34mSELECT "players".* FROM "players"[0m
+  ↳ app/views/games/new.html.erb:4
+  Rendered games/new.html.erb within layouts/application (Duration: 1.3ms | Allocations: 690)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 8ms (Views: 7.1ms | ActiveRecord: 0.3ms | Allocations: 5014)
+
+
+Started GET "/games/new" for ::1 at 2021-01-26 16:20:53 -0800
+Processing by GamesController#new as HTML
+  Rendering games/new.html.erb within layouts/application
+  [1m[36mPlayer Load (0.4ms)[0m  [1m[34mSELECT "players".* FROM "players"[0m
+  ↳ app/views/games/new.html.erb:4
+  Rendered games/new.html.erb within layouts/application (Duration: 1.2ms | Allocations: 681)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 10ms (Views: 9.6ms | ActiveRecord: 0.4ms | Allocations: 4996)
+
+
+Started GET "/games/new" for ::1 at 2021-01-26 16:21:29 -0800
+Processing by GamesController#new as HTML
+  Rendering games/new.html.erb within layouts/application
+  [1m[36mPlayer Load (0.3ms)[0m  [1m[34mSELECT "players".* FROM "players"[0m
+  ↳ app/views/games/new.html.erb:4
+  Rendered games/new.html.erb within layouts/application (Duration: 1.4ms | Allocations: 681)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 8ms (Views: 7.4ms | ActiveRecord: 0.3ms | Allocations: 4995)
+
+
+Started GET "/games/new" for ::1 at 2021-01-26 16:21:35 -0800
+Processing by GamesController#new as HTML
+  Rendering games/new.html.erb within layouts/application
+  [1m[36mPlayer Load (0.3ms)[0m  [1m[34mSELECT "players".* FROM "players"[0m
+  ↳ app/views/games/new.html.erb:4
+  Rendered games/new.html.erb within layouts/application (Duration: 1.4ms | Allocations: 690)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 9ms (Views: 8.1ms | ActiveRecord: 0.3ms | Allocations: 5013)
+
+
+Started GET "/games/new" for ::1 at 2021-01-26 16:21:53 -0800
+Processing by GamesController#new as HTML
+  Rendering games/new.html.erb within layouts/application
+  [1m[36mPlayer Load (0.4ms)[0m  [1m[34mSELECT "players".* FROM "players"[0m
+  ↳ app/views/games/new.html.erb:4
+  Rendered games/new.html.erb within layouts/application (Duration: 1.5ms | Allocations: 684)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 12ms (Views: 10.5ms | ActiveRecord: 0.4ms | Allocations: 5002)
+
+
+Started GET "/games/new" for ::1 at 2021-01-26 16:22:59 -0800
+Processing by GamesController#new as HTML
+  Rendering games/new.html.erb within layouts/application
+  [1m[36mPlayer Load (0.3ms)[0m  [1m[34mSELECT "players".* FROM "players"[0m
+  ↳ app/views/games/new.html.erb:4
+  Rendered games/new.html.erb within layouts/application (Duration: 1.3ms | Allocations: 681)
+[Webpacker] Everything's up-to-date. Nothing to do
+Completed 200 OK in 12ms (Views: 10.9ms | ActiveRecord: 0.3ms | Allocations: 5002)
+
+

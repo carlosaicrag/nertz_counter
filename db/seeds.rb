@@ -8,6 +8,7 @@
 
 Game.destroy_all
 Round.destroy_all
+Player.destroy_all
 
 game1 = Game.create(end: false)
 game2 = Game.create(end:true)

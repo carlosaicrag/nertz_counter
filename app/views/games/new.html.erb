@@ -1,0 +1,10 @@
+<h1> Creating a new Game page</h1>
+
+<form action="/games" method="post">
+  <% @players.each do |player| %>
+    <label> <%= player.username %>
+        <input type="checkbox" name="player[player_ids][]" id="" value="<% player.id %>"> 
+    </label>
+  <%  end %>
+  <input type="submit" value="create a new Game">
+</form>

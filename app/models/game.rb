@@ -7,8 +7,12 @@ class Game < ApplicationRecord
   through: :rounds,
   source: :player_rounds
 
+  has_many :game_players,
+  foreign_key: :game_id,
+  class_name: :GamePlayer
+
   has_many :players,
-  through: :player_rounds,
+  through: :game_players,
   source: :player
 
 end
